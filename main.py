@@ -1,5 +1,6 @@
-import sys
 import random
+import sys
+
 import pygame
 
 # Konfigurasi
@@ -21,54 +22,54 @@ WHITE = (240, 240, 240)
 # Kita gunakan pivot pada pusat grid 4x4 (0..3). Posisi awal akan di-offset ke tengah papan.
 # Warna unik tiap bentuk.
 TETROMINOES = {
-    'I': {
-        'color': (0, 240, 240),
-        'rotations': [
+    "I": {
+        "color": (0, 240, 240),
+        "rotations": [
             [(0, 1), (1, 1), (2, 1), (3, 1)],  # ---- horizontal
             [(2, 0), (2, 1), (2, 2), (2, 3)],  # | vertikal
         ],
     },
-    'O': {
-        'color': (240, 240, 0),
-        'rotations': [
+    "O": {
+        "color": (240, 240, 0),
+        "rotations": [
             [(1, 1), (2, 1), (1, 2), (2, 2)],  # kotak, satu rotasi cukup
         ],
     },
-    'T': {
-        'color': (160, 0, 240),
-        'rotations': [
+    "T": {
+        "color": (160, 0, 240),
+        "rotations": [
             [(1, 1), (0, 1), (2, 1), (1, 2)],
             [(1, 1), (1, 0), (1, 2), (2, 1)],
             [(1, 1), (0, 1), (2, 1), (1, 0)],
             [(1, 1), (1, 0), (1, 2), (0, 1)],
         ],
     },
-    'S': {
-        'color': (0, 240, 0),
-        'rotations': [
+    "S": {
+        "color": (0, 240, 0),
+        "rotations": [
             [(1, 1), (2, 1), (0, 2), (1, 2)],
             [(1, 0), (1, 1), (2, 1), (2, 2)],
         ],
     },
-    'Z': {
-        'color': (240, 0, 0),
-        'rotations': [
+    "Z": {
+        "color": (240, 0, 0),
+        "rotations": [
             [(0, 1), (1, 1), (1, 2), (2, 2)],
             [(2, 0), (2, 1), (1, 1), (1, 2)],
         ],
     },
-    'J': {
-        'color': (0, 0, 240),
-        'rotations': [
+    "J": {
+        "color": (0, 0, 240),
+        "rotations": [
             [(0, 1), (0, 2), (1, 2), (2, 2)],
             [(1, 0), (2, 0), (1, 1), (1, 2)],
             [(0, 1), (1, 1), (2, 1), (2, 2)],
             [(1, 0), (1, 1), (1, 2), (0, 2)],
         ],
     },
-    'L': {
-        'color': (240, 160, 0),
-        'rotations': [
+    "L": {
+        "color": (240, 160, 0),
+        "rotations": [
             [(2, 1), (0, 2), (1, 2), (2, 2)],
             [(1, 0), (1, 1), (1, 2), (2, 2)],
             [(0, 1), (0, 2), (1, 1), (2, 1)],
@@ -78,6 +79,7 @@ TETROMINOES = {
 }
 
 # Utilitas grid
+
 
 def create_grid():
     return [[None for _ in range(COLS)] for _ in range(ROWS)]
@@ -100,7 +102,7 @@ class Piece:
     def __init__(self, kind):
         self.kind = kind
         self.defn = TETROMINOES[kind]
-        self.color = self.defn['color']
+        self.color = self.defn["color"]
         self.rot_index = 0
         # posisi origin (offset untuk rotasi berbasis grid 4x4)
         # spawn di atas tengah papan
@@ -110,7 +112,7 @@ class Piece:
     def cells(self, rot_index=None, offset=(0, 0)):
         if rot_index is None:
             rot_index = self.rot_index
-        rot = self.defn['rotations'][rot_index % len(self.defn['rotations'])]
+        rot = self.defn["rotations"][rot_index % len(self.defn["rotations"])]
         ox, oy = offset
         return [(self.x + cx + ox, self.y + cy + oy) for (cx, cy) in rot]
 
@@ -129,7 +131,7 @@ class Piece:
         return True
 
     def try_rotate(self, grid):
-        next_rot = (self.rot_index + 1) % len(self.defn['rotations'])
+        next_rot = (self.rot_index + 1) % len(self.defn["rotations"])
         test = self.cells(rot_index=next_rot)
         # wall kick sederhana: coba beberapa offset
         kicks = [(0, 0), (-1, 0), (1, 0), (-2, 0), (2, 0), (0, -1)]
@@ -195,7 +197,12 @@ def draw_grid(surface, grid, font, score):
                 pygame.draw.rect(
                     surface,
                     color,
-                    (x * BLOCK + BORDER, y * BLOCK + BORDER, BLOCK - 2 * BORDER, BLOCK - 2 * BORDER),
+                    (
+                        x * BLOCK + BORDER,
+                        y * BLOCK + BORDER,
+                        BLOCK - 2 * BORDER,
+                        BLOCK - 2 * BORDER,
+                    ),
                     border_radius=4,
                 )
 
@@ -216,7 +223,12 @@ def draw_piece(surface, piece):
             pygame.draw.rect(
                 surface,
                 piece.color,
-                (x * BLOCK + BORDER, y * BLOCK + BORDER, BLOCK - 2 * BORDER, BLOCK - 2 * BORDER),
+                (
+                    x * BLOCK + BORDER,
+                    y * BLOCK + BORDER,
+                    BLOCK - 2 * BORDER,
+                    BLOCK - 2 * BORDER,
+                ),
                 border_radius=4,
             )
 
@@ -275,7 +287,9 @@ def main():
                     current = next_piece
                     next_piece = Piece(random.choice(list(TETROMINOES.keys())))
                     # cek spawn collision -> game over
-                    if not can_place(grid, [(x, y) for x, y in current.cells() if y >= 0]):
+                    if not can_place(
+                        grid, [(x, y) for x, y in current.cells() if y >= 0]
+                    ):
                         running = False
                         break
             elif event.type == pygame.KEYUP:
@@ -314,7 +328,9 @@ def game_over(screen, font, score):
     overlay = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
     overlay.fill((0, 0, 0, 180))
 
-    title = pygame.font.SysFont("consolas", 36, bold=True).render("GAME OVER", True, WHITE)
+    title = pygame.font.SysFont("consolas", 36, bold=True).render(
+        "GAME OVER", True, WHITE
+    )
     info = font.render("Press R to Restart or ESC to Quit", True, WHITE)
     sc = font.render(f"Score: {score}", True, WHITE)
 
